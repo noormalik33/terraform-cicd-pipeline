@@ -6,10 +6,13 @@ on:
 
 jobs:
   terraform:
+    name: "Terraform Apply"
     runs-on: ubuntu-latest
+    
+    # We are running at the root of the repo
     defaults:
       run:
-        working-directory: ./03-production
+        working-directory: .
 
     steps:
     - name: Checkout Code
@@ -17,6 +20,8 @@ jobs:
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
 
     - name: Terraform Init
       env:
@@ -28,11 +33,13 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # Tries to select 'prod', creates it if missing
       run: terraform workspace select prod || terraform workspace new prod
 
     - name: Terraform Apply
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # We disable the provisioner (Nginx install) for CI/CD to avoid SSH key issues in GitHub
-      run: terraform apply -auto-approve -target=module.web_server.aws_instance.this -var="private_key_path=/dev/null"
+      # We set private_key_path to /dev/null because GitHub doesn't have the .pem file
+      # This skips the Nginx installation but allows the server creation to succeed
+      run: terraform apply -auto-approve -var="private_key_path=/dev/null"
