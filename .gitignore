@@ -1,8 +1,6 @@
-# Ignore Terraform system files
+# Terraform
 .terraform/
-*.tfstate
-*.tfstate.backup
 .terraform.lock.hcl
 
-# IMPORTANT: Ignore SSH Keys
-*.pem
+# Sensitive keys
+my-aws-key.pem

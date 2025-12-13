@@ -1,28 +1,61 @@
-# Task 6: Data Source (Finds latest Ubuntu AMI automatically)
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
+# main.tf
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 }
 
-# Task 5 & 8: Calling the Module with Workspace support
-module "web_server" {
-  source = "./modules/web_server"
-
-  ami_id           = data.aws_ami.ubuntu.id
-  instance_type    = "t3.micro"            # t3.micro is safer for new accounts
-  environment      = terraform.workspace   # Task 8: Uses "dev", "prod", etc. automatically
-  
-  # SSH Config for Task 9
-  key_name         = "my-aws-key"          # Must match Key Pair name in AWS Console
-  private_key_path = "./my-aws-key.pem"    # Must match the file name on your laptop
+provider "aws" {
+  region = var.aws_region
 }
 
-# Output the IP so you can visit the website
-output "website_ip" {
-  value = module.web_server.public_ip
+# Security Group for EC2 allowing SSH and HTTP
+resource "aws_security_group" "allow_ssh_http" {
+  name        = "allow_ssh_http"
+  description = "Allow SSH and HTTP inbound traffic"
+
+  ingress {
+    description      = "SSH"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description      = "HTTP"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# ✅ Module call for web server
+module "web_server" {
+  source        = "./modules/web_server"
+  ami_id        = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  environment   = var.environment
+
+  # ✅ Removed private_key_path completely
+}
+
+output "web_server_public_ip" {
+  description = "Public IP of the web server"
+  value       = module.web_server.public_ip
 }

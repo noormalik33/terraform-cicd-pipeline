@@ -1,3 +1,5 @@
+# provider.tf
+
 terraform {
   required_providers {
     aws = {
@@ -6,9 +8,9 @@ terraform {
     }
   }
 
-  # Task 7: Remote Backend Configuration
+  # ✅ Remote Backend Configuration (S3 + DynamoDB for state locking)
   backend "s3" {
-    bucket         = "au-tf-state-noor-2025"  # <--- REPLACE WITH YOUR BUCKET NAME
+    bucket         = "au-tf-state-noor-2025"  # <-- Your S3 bucket
     key            = "prod/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
