@@ -1,4 +1,5 @@
-output "public_ip" {
-  description = "Public IP of the EC2 instance"
-  value       = aws_instance.this.public_ip
+# modules/web_server/outputs.tf
+
+output "instance_ip" {
+  value = aws_instance.this.public_ip
 }

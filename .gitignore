@@ -1,6 +1,4 @@
-# Terraform
 .terraform/
-.terraform.lock.hcl
-
-# Sensitive keys
-my-aws-key.pem
+*.tfstate
+*.tfstate.backup
+*.pem

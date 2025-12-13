@@ -1,29 +1,41 @@
 # modules/web_server/main.tf
 
-# EC2 Instance Resource
-resource "aws_instance" "this" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = var.key_name
+resource "aws_security_group" "allow_ssh_http" {
+  name        = "allow_ssh_http_${var.environment}"
+  description = "Allow SSH and HTTP inbound traffic"
 
+  ingress {
+    description = "SSH from anywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "this" {
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
 
   tags = {
     Name        = "Web-${var.environment}"
     Environment = var.environment
   }
-
-  # ✅ User data replaces remote-exec for CI/CD safe provisioning
-  user_data = <<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y nginx
-    systemctl start nginx
-  EOF
-}
-
-# Optional: Output public IP of this instance
-output "public_ip" {
-  description = "Public IP of the EC2 instance"
-  value       = aws_instance.this.public_ip
 }
