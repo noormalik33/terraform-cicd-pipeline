@@ -5,7 +5,7 @@ module "web_server" {
 
   ami_id        = "ami-0030e4319cbf4dbf2" # Ubuntu 22.04 in us-east-1
   instance_type = "t3.micro"
-  key_name      = "terraform-key"         # Ensure this key exists in your AWS Console
+  key_name      = "final-key"         # Ensure this key exists in your AWS Console
   environment   = "prod"
 }
 
