@@ -11,7 +11,7 @@ terraform {
   # IMPORTANT: We are using S3 for state (Phase 3 requirement)
   # Replace "my-terraform-bucket-unique-123" with YOUR ACTUAL BUCKET NAME from Phase 1
   backend "s3" {
-    bucket         = "my-terraform-bucket-noor-123" # <--- UPDATE THIS NAME
+    bucket         = "au-tf-state-noor-2025" # <--- UPDATE THIS NAME
     key            = "prod/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
