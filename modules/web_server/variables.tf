@@ -1,6 +1,4 @@
-# modules/web_server/variables.tf
-
-variable "ami_id" {}
+# variable "ami_id" {}  <-- DELETED or Commented out
 variable "instance_type" {}
 variable "key_name" {}
 variable "environment" {}
