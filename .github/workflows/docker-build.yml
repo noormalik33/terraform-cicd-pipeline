@@ -1,0 +1,26 @@
+name: Docker Build Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '03-production/**' # Only trigger if changes happen in your production folder
+
+jobs:
+  build-docker:
+    name: Build & Test Docker Image
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Image
+        # We tell it to look inside the '03-production' folder for the Dockerfile
+        run: |
+          docker build -t my-web-app:v1 ./03-production
+          echo "Docker Image built successfully! "
